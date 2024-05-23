@@ -184,16 +184,26 @@ class BaseProfileMapping(ABC):
         if self.dbt_profile_method:
             mock_profile[DBT_PROFILE_METHOD_FIELD] = self.dbt_profile_method
 
+        try:
+            mapped_params = self.mapped_params
+            print("mapped_params: ", mapped_params)
+        except Exception:
+            mapped_params = {}
+
         for field in self.required_fields:
-            # if someone has passed in a value for this field, use it
             if self.profile_args.get(field):
                 mock_profile[field] = self.profile_args[field]
-
+            elif mapped_params.get(field):
+                mock_profile[field] = mapped_params[field]
             # otherwise, use the default value
             else:
                 mock_profile[field] = "mock_value"
 
-        return mock_profile
+        # TODO: This may not require
+        # for field in self.secret_fields:
+        #     mock_profile[field] = self.get_env_var_format(field)
+
+        return self.filter_null(mock_profile)
 
     @property
     def env_vars(self) -> dict[str, str]:
