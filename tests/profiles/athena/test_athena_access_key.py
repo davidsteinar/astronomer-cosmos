@@ -1,4 +1,4 @@
-"Tests for the Athena profile."
+"""Tests for the Athena profile."""
 
 import json
 import sys
